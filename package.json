@@ -8,8 +8,7 @@
     "nodewise": "bin/nodewise.js"
   },
   "scripts": {
-    "pretest": "echo 'Setup required before first run'",
-    "test": "node bin/nodewise.js --help"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "cli",
@@ -28,6 +27,21 @@
     "chokidar": "^3.5.3",
     "chalk": "^4.1.2"
   },
+  "files": [
+    "bin",
+    "src",
+    "examples",
+    "README.md",
+    "USER_MANUAL.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gourab2005/nodewise.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Gourab2005/nodewise/issues"
+  },
+  "homepage": "https://github.com/Gourab2005/nodewise#readme",
   "devDependencies": {},
   "engines": {
     "node": ">=18.0.0"
