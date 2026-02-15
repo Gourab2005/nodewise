@@ -1,0 +1,35 @@
+{
+  "name": "nodewise",
+  "version": "1.0.0",
+  "description": "Node.js error explainer with AI-powered clarity",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "bin": {
+    "nodewise": "bin/nodewise.js"
+  },
+  "scripts": {
+    "pretest": "echo 'Setup required before first run'",
+    "test": "node bin/nodewise.js --help"
+  },
+  "keywords": [
+    "cli",
+    "node",
+    "error",
+    "debugging",
+    "ai",
+    "gemini",
+    "explainer"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "inquirer": "^9.2.15",
+    "axios": "^1.6.5",
+    "chokidar": "^3.5.3",
+    "chalk": "^4.1.2"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

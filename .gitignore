@@ -1,0 +1,17 @@
+node_modules/
+npm-debug.log
+.DS_Store
+.env
+.env.local
+.env.*.local
+nodewise.config.json
+*.log
+dist/
+build/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.nyc_output/
+coverage/
