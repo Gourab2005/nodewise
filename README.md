@@ -71,6 +71,9 @@ Traditional error messages can be cryptic, long, or stacked with irrelevant inte
 
 ## 📋 Example Output
 
+<img width="1836" height="694" alt="Screenshot 2026-02-15 223424" src="https://github.com/user-attachments/assets/412f60cf-5ab6-4662-8a0a-1f92145f2485" />
+
+
   ✦ GEMINI INTELLIGENCE
   ─────────────────────────────────────────────
 
