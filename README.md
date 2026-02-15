@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo.png" alt="NodeWise Logo" width="200px">
+</p>
+
 # nodewise
 
 > Node.js error explainer with AI-powered clarity
