@@ -19,7 +19,7 @@
     "gemini",
     "explainer"
   ],
-  "author": "",
+  "author": "Gourab Das",
   "license": "MIT",
   "dependencies": {
     "inquirer": "^9.2.15",
@@ -32,7 +32,9 @@
     "src",
     "examples",
     "README.md",
-    "USER_MANUAL.md"
+    "USER_MANUAL.md",
+    "logo.png",
+    "LICENSE"
   ],
   "repository": {
     "type": "git",
