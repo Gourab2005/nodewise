@@ -8,7 +8,14 @@ const chalk = require('chalk');
 const readline = require('readline');
 const { explain } = require('./index');
 
+// Global state for cancellation
+let cancelPrompt = false;
+let activePromptResolver = null;
+
 async function showInteractiveExplainer(errorText, config) {
+  // Reset cancel flag
+  cancelPrompt = false;
+
   console.log('\n');
   const summary = (errorText || '').toString().split('\n')[0] || 'Unknown error';
 
@@ -20,34 +27,105 @@ async function showInteractiveExplainer(errorText, config) {
   console.log(chalk.white('    ' + summary));
   console.log();
 
-  // Compact, modern prompt
-  console.log(chalk.cyan.bold('    ? ') + chalk.white('Would you like an AI explanation?'));
-  console.log(chalk.gray('      [y] Yes, explain it  [n] No, just skip'));
-  console.log();
-
   const answer = await getUserInput();
 
-  if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes' || answer === '') {
+  if (answer === 'yes') {
     await explainErrorInteractively(errorText, config);
+  } else if (answer === 'cancelled') {
+    // Silently skip on cancellation
   } else {
     console.log(chalk.gray('    Skipped.\n'));
   }
 }
 
-function getUserInput() {
+async function getUserInput() {
   return new Promise((resolve) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-      terminal: true
-    });
+    const options = [
+      { label: chalk.green('✓ Yes, explain it'), value: 'yes' },
+      { label: chalk.gray('✗ No, just skip'), value: 'no' }
+    ];
 
-    process.stdout.write(chalk.cyan('    > '));
+    let selectedIndex = 0;
+    let isResolved = false;
 
-    rl.on('line', (answer) => {
-      rl.close();
-      resolve(answer.trim());
-    });
+    // Store resolver for cancellation
+    activePromptResolver = () => {
+      if (!isResolved) {
+        cleanup();
+        isResolved = true;
+        resolve('cancelled');
+      }
+    };
+
+    // Display the question
+    console.log(chalk.cyan('    ? ') + chalk.white('Would you like an AI explanation?'));
+
+    const renderOptions = () => {
+      options.forEach((option, index) => {
+        const prefix = index === selectedIndex ? chalk.cyan('❯ ') : '  ';
+        console.log(`    ${prefix}${option.label}`);
+      });
+    };
+
+    const cleanup = () => {
+      process.stdin.removeListener('keypress', onKeypress);
+      if (process.stdin.isTTY) {
+        process.stdin.setRawMode(false);
+      }
+      process.stdin.pause();
+      activePromptResolver = null;
+    };
+
+    // Initial render
+    renderOptions();
+
+    // Setup readline for keypress
+    readline.emitKeypressEvents(process.stdin);
+    if (process.stdin.isTTY) {
+      process.stdin.setRawMode(true);
+    }
+
+    const onKeypress = (str, key) => {
+      // Check if cancelled
+      if (cancelPrompt) {
+        cleanup();
+        if (!isResolved) {
+          isResolved = true;
+          console.log(chalk.yellow('\n    (Skipped due to restart)\n'));
+          resolve('cancelled');
+        }
+        return;
+      }
+
+      if (key.name === 'up') {
+        // Clear previous options
+        process.stdout.write('\x1b[' + options.length + 'A'); // Move cursor up
+        process.stdout.write('\x1b[0J'); // Clear from cursor down
+
+        selectedIndex = selectedIndex > 0 ? selectedIndex - 1 : options.length - 1;
+        renderOptions();
+      } else if (key.name === 'down') {
+        // Clear previous options
+        process.stdout.write('\x1b[' + options.length + 'A'); // Move cursor up
+        process.stdout.write('\x1b[0J'); // Clear from cursor down
+
+        selectedIndex = selectedIndex < options.length - 1 ? selectedIndex + 1 : 0;
+        renderOptions();
+      } else if (key.name === 'return') {
+        cleanup();
+        if (!isResolved) {
+          isResolved = true;
+          console.log(); // Add newline after selection
+          resolve(options[selectedIndex].value);
+        }
+      } else if (key.ctrl && key.name === 'c') {
+        cleanup();
+        process.exit(0);
+      }
+    };
+
+    process.stdin.on('keypress', onKeypress);
+    process.stdin.resume();
   });
 }
 
@@ -67,6 +145,16 @@ function showThinking() {
 function clearThinking(interval) {
   clearInterval(interval);
   process.stdout.write('\r' + ' '.repeat(50) + '\r');
+}
+
+/**
+ * Cancel any active prompt
+ */
+function cancelActivePrompt() {
+  cancelPrompt = true;
+  if (activePromptResolver) {
+    activePromptResolver();
+  }
 }
 
 function displayExplanation(explanation) {
@@ -119,5 +207,6 @@ async function explainErrorInteractively(errorText, config) {
 
 module.exports = {
   showInteractiveExplainer,
-  displayExplanation
+  displayExplanation,
+  cancelActivePrompt
 };

@@ -12,7 +12,7 @@ const { spawn } = require('child_process');
 const chokidar = require('chokidar');
 const chalk = require('chalk');
 const { explain } = require('./explainer');
-const { showInteractiveExplainer } = require('./explainer/interactive');
+const { showInteractiveExplainer, cancelActivePrompt } = require('./explainer/interactive');
 
 class Runner {
   constructor(scriptPath, args = [], config = {}) {
@@ -57,7 +57,7 @@ class Runner {
       const text = data.toString();
       process.stderr.write(text);
       errorBuffer += text;
-      
+
       // Detect errors in stderr and explain them immediately
       if (this.isErrorOutput(text)) {
         this.explainErrorWithDebounce(text);
@@ -85,7 +85,7 @@ class Runner {
 
     this.child.on('exit', (code, signal) => {
       this.isProcessExiting = true;
-      
+
       if (code !== 0 && code !== null) {
         // Process exited with error
         if (!this.isRestarting && errorBuffer) {
@@ -148,15 +148,18 @@ class Runner {
 
     this.isRestarting = true;
 
+    // Cancel any active interactive prompt
+    cancelActivePrompt();
+
     if (this.child) {
       this.child.kill('SIGTERM');
-      
+
       // Wait a bit for graceful shutdown
       setTimeout(() => {
         if (this.child && !this.child.killed) {
           this.child.kill('SIGKILL');
         }
-        
+
         setTimeout(() => {
           this.isRestarting = false;
           if (reason) {
@@ -175,6 +178,9 @@ class Runner {
    * Stop the process and watcher
    */
   stop() {
+    // Cancel any active interactive prompt
+    cancelActivePrompt();
+
     if (this.watcher) {
       this.watcher.close();
       this.watcher = null;
@@ -228,7 +234,7 @@ class Runner {
       return;
     }
     this.lastErrorExplanationTime = now;
-    
+
     // Don't explain startup errors that already caused process exit
     if (this.isProcessExiting) {
       return;
