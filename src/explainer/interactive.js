@@ -87,12 +87,12 @@ function displayExplanation(explanation) {
 
     // High-end minimalist styling
     // If it starts with a keyword, add a line break before it to create gaps between sections
-    if (/^(Summary|Problem|Cause|Solution|Fix|Where|Why|File|Line|Note|Suggestion):/i.test(content)) {
+    if (/^(Summary|Problem|Cause|Solution|Fix|Where|Why|File|Line|Note|Suggestion|Minimal code fix|Code):/i.test(content)) {
       console.log();
     }
 
     content = content
-      .replace(/^(Summary|Problem|Cause|Solution|Fix|Where|Why|File|Line|Note|Suggestion):/i, (match) => chalk.hex('#FFAF00').bold(match))
+      .replace(/^(Summary|Problem|Cause|Solution|Fix|Where|Why|File|Line|Note|Suggestion|Minimal code fix|Code):/i, (match) => chalk.hex('#FFAF00').bold(match))
       .replace(/`([^`]+)`/g, (match) => chalk.hex('#00FF87')(match))
       .replace(/'([^']+)'/g, (match) => chalk.hex('#00FF87')(match));
 

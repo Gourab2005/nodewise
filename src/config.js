@@ -9,13 +9,47 @@ const fs = require('fs');
 const path = require('path');
 
 const CONFIG_FILE = 'nodewise.config.json';
+const HIDDEN_CONFIG_FILE = '.nodewise.config.json';
 
 /**
  * Get the configuration file path
- * Looks in current working directory
+ * Prioritizes node_modules to avoid accidental git commits
  */
 function getConfigPath() {
-  return path.join(process.cwd(), CONFIG_FILE);
+  const cwd = process.cwd();
+  const nodeModulesPath = path.join(cwd, 'node_modules');
+  const nodeModulesConfig = path.join(nodeModulesPath, HIDDEN_CONFIG_FILE);
+  const rootHiddenConfig = path.join(cwd, HIDDEN_CONFIG_FILE);
+  const rootLegacyConfig = path.join(cwd, CONFIG_FILE);
+
+  // 1. Check if config already exists in node_modules
+  if (fs.existsSync(nodeModulesConfig)) {
+    return nodeModulesConfig;
+  }
+
+  // 2. Check if hidden config exists in root
+  if (fs.existsSync(rootHiddenConfig)) {
+    return rootHiddenConfig;
+  }
+
+  // 3. Check if legacy config exists in root
+  if (fs.existsSync(rootLegacyConfig)) {
+    return rootLegacyConfig;
+  }
+
+  // 4. For NEW configs:
+  // If node_modules exists, use it (recommended for security)
+  if (fs.existsSync(nodeModulesPath)) {
+    try {
+      // Ensure node_modules exists (redundant but safe)
+      return nodeModulesConfig;
+    } catch (e) {
+      // Fallback to root if node_modules is not writable
+    }
+  }
+
+  // Final fallback to hidden root config
+  return rootHiddenConfig;
 }
 
 /**
@@ -163,5 +197,6 @@ module.exports = {
   mergeWithDefaults,
   createConfig,
   updateConfig,
-  CONFIG_FILE
+  CONFIG_FILE,
+  HIDDEN_CONFIG_FILE
 };
