@@ -26,7 +26,7 @@ function parseArgs() {
     setup: false,
     reset: false
   };
-  
+
   let scriptPath = null;
   const scriptArgs = [];
 
@@ -78,13 +78,14 @@ ${chalk.bold('MODES')}
   ${chalk.cyan('Normal Detection')}      - Pattern-based error detection (offline)
 
 ${chalk.bold('CONFIGURATION')}
-  Settings are saved in ${chalk.yellow('nodewise.config.json')} in your project root.
+  Settings are saved in ${chalk.yellow('node_modules/.nodewise.config.json')} (if available)
+  or ${chalk.yellow('.nodewise.config.json')} in your project root.
+  This ensures your API keys are not accidentally committed to version control.
 
 ${chalk.bold('DOCUMENTATION')}
   https://github.com/yourusername/nodewise
   `);
 }
-
 /**
  * Display version
  */

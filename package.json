@@ -22,10 +22,10 @@
   "author": "Gourab Das",
   "license": "MIT",
   "dependencies": {
-    "inquirer": "^9.2.15",
     "axios": "^1.6.5",
+    "chalk": "^4.1.2",
     "chokidar": "^3.5.3",
-    "chalk": "^4.1.2"
+    "inquirer": "^9.2.15"
   },
   "files": [
     "bin",
@@ -44,7 +44,6 @@
     "url": "https://github.com/Gourab2005/nodewise/issues"
   },
   "homepage": "https://github.com/Gourab2005/nodewise#readme",
-  "devDependencies": {},
   "engines": {
     "node": ">=18.0.0"
   }
